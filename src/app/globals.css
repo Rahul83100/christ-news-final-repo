@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 5, 44, 107;
+  /* Catalina Blue Text */
+  --background-start-rgb: 255, 255, 255;
+  /* Pure White */
+  --background-end-rgb: 232, 240, 254;
+  /* Soft Light Blue (christ-light) */
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom,
+      rgb(var(--background-start-rgb)),
+      rgb(var(--background-end-rgb))) fixed;
+  min-height: 100vh;
+}
+
+/* Custom Utilities */
+@layer components {
+
+  /* Updated Book Card for Blue Theme */
+  .book-card {
+    /* @apply removed - utilities moved to component */
+    box-shadow:
+      0 10px 30px -10px rgba(0, 38, 77, 0.3),
+      /* Blue Shadow */
+      0 4px 6px -2px rgba(0, 38, 77, 0.1);
+  }
+
+  .book-spine {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(0, 0, 0, 0.2) 100%);
+  }
+
+  /* Custom Scrollbar for Reader */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #bfa36f;
+    /* Gold Scrollbar */
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a38755;
+  }
+}
