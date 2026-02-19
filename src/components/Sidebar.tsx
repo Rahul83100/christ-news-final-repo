@@ -71,13 +71,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, user, role, onSignOu
                                         >
                                             <LogOut size={10} /> Sign Out
                                         </button>
-                                        <Link
-                                            href="/profile/settings"
-                                            className="text-[10px] text-christ-blue font-bold uppercase tracking-wider hover:underline"
-                                            onClick={onClose}
-                                        >
-                                            Change Password
-                                        </Link>
                                     </div>
                                 </div>
                             ) : (

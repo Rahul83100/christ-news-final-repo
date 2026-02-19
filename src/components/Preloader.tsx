@@ -7,10 +7,18 @@ export default function Preloader() {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
+        // Check if user has already seen the preloader in this session
+        const hasSeen = sessionStorage.getItem('hasSeenPreloader');
+        if (hasSeen) {
+            setIsVisible(false);
+            return;
+        }
+
         const interval = setInterval(() => {
             setProgress(prev => {
                 if (prev >= 100) {
                     clearInterval(interval);
+                    sessionStorage.setItem('hasSeenPreloader', 'true');
                     setTimeout(() => setIsVisible(false), 800);
                     return 100;
                 }
@@ -206,7 +214,10 @@ export default function Preloader() {
                 </div>
             </div>
 
-            <button onClick={() => setIsVisible(false)} className="skip-button">
+            <button onClick={() => {
+                sessionStorage.setItem('hasSeenPreloader', 'true');
+                setIsVisible(false);
+            }} className="skip-button">
                 Skip Intro
             </button>
 

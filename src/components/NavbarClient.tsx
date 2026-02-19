@@ -29,8 +29,14 @@ const NavbarClient: React.FC<NavbarClientProps> = ({ user, role }) => {
     }
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut()
-        router.refresh()
+        try {
+            await supabase.auth.signOut()
+            // Force reload to home to clear all states immediately
+            window.location.href = '/'
+        } catch (error) {
+            console.error('Sign out failed:', error)
+            router.push('/')
+        }
     }
 
     const topNavLinks = [
