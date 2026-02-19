@@ -5,7 +5,8 @@ import { createServerClient } from '@/lib/supabase-server'
 
 export const dynamic = 'force-dynamic'
 
-const resend = new Resend(process.env.re_6WbDD9pL_L5Aez54ShHTtaiBau7C6r9om)
+const resend = new Resend(process.env.RESEND_API_KEY)    
+
 
 export async function GET(request: Request) {
     // Basic authorization for Cron Job
@@ -83,4 +84,5 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
 }
+
 
