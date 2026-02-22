@@ -80,19 +80,19 @@ const NavbarClient: React.FC<NavbarClientProps> = ({ user, role }) => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search volumes, editions..."
-                                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-christ-blue transition-all"
+                                className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-christ-blue transition-all text-gray-900 placeholder:text-gray-400"
                                 autoFocus={isSearchOpen}
                             />
-                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-christ-blue" strokeWidth={2.5} />
                         </form>
                     </div>
 
                     <div className="flex items-center gap-3 flex-shrink-0">
                         <button
                             onClick={() => setIsSearchOpen(!isSearchOpen)}
-                            className={`p-2 hover:bg-gray-100 rounded-full transition-colors ${isSearchOpen ? 'text-christ-blue bg-christ-light' : 'text-gray-700'}`}
+                            className={`p-2.5 hover:bg-christ-light rounded-full transition-all duration-300 ${isSearchOpen ? 'text-white bg-christ-blue shadow-lg scale-110' : 'text-gray-700 hover:text-christ-blue hover:scale-105'}`}
                         >
-                            <Search size={22} />
+                            <Search size={24} strokeWidth={2.5} />
                         </button>
                         {!user && (
                             <Link

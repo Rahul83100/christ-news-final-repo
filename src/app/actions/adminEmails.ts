@@ -22,9 +22,9 @@ export async function addAdminEmail(email: string) {
 
     const normalizedEmail = email.toLowerCase().trim()
 
-    // Check if email already exists in admin_emails
+    // Check if email already exists in admin_users
     const { data: existing } = await supabase
-        .from('admin_emails')
+        .from('admin_users')
         .select('id')
         .eq('email', normalizedEmail)
         .single()
@@ -33,9 +33,9 @@ export async function addAdminEmail(email: string) {
         throw new Error('This email is already registered as admin')
     }
 
-    // Insert into admin_emails
+    // Insert into admin_users
     const { error } = await supabase
-        .from('admin_emails')
+        .from('admin_users')
         .insert({ email: normalizedEmail, added_by: user.id })
 
     if (error) throw new Error(error.message)
@@ -77,7 +77,7 @@ export async function removeAdminEmail(adminEmailId: string) {
 
     // Safety: ensure at least 1 admin email remains
     const { count } = await supabase
-        .from('admin_emails')
+        .from('admin_users')
         .select('*', { count: 'exact', head: true })
 
     if (count !== null && count <= 1) {
@@ -86,14 +86,14 @@ export async function removeAdminEmail(adminEmailId: string) {
 
     // Get the email before deleting so we can demote the profile
     const { data: adminEmailRow } = await supabase
-        .from('admin_emails')
+        .from('admin_users')
         .select('email')
         .eq('id', adminEmailId)
         .single()
 
-    // Delete from admin_emails
+    // Delete from admin_users
     const { error } = await supabase
-        .from('admin_emails')
+        .from('admin_users')
         .delete()
         .eq('id', adminEmailId)
 

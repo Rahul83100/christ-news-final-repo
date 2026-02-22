@@ -115,7 +115,7 @@ export default function HomePage({ isAdmin }: HomePageProps) {
                             transition={{ delay: 0.2 }}
                             className="font-serif text-xl md:text-2xl text-forest-700 max-w-3xl mx-auto leading-relaxed opacity-90"
                         >
-                            A premium collection of scholarly articles, creative newsletters, and community updates from the heart of Christ University.
+                            A premium collection of scholarly articles, creative newsletters, and community updates from the heart of CHRIST Online.
                         </motion.p>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -415,8 +415,8 @@ export default function HomePage({ isAdmin }: HomePageProps) {
 
                                 <div className="pt-4 border-t border-forest-800 flex flex-wrap gap-4 items-center justify-center md:justify-start">
                                     <div className="flex gap-3">
-                                        <a href="#" className="p-2 bg-forest-800 hover:bg-forest-700 rounded-full transition-all hover:-translate-y-1"><Linkedin size={16} /></a>
-                                        <a href="#" className="p-2 bg-forest-800 hover:bg-forest-700 rounded-full transition-all hover:-translate-y-1"><Github size={16} /></a>
+                                        <a href="https://www.linkedin.com/in/rahul-r-955a08346/" target="_blank" rel="noopener noreferrer" className="p-2 bg-forest-800 hover:bg-forest-700 rounded-full transition-all hover:-translate-y-1"><Linkedin size={16} /></a>
+                                        <a href="https://github.com/Rahul83100" target="_blank" rel="noopener noreferrer" className="p-2 bg-forest-800 hover:bg-forest-700 rounded-full transition-all hover:-translate-y-1"><Github size={16} /></a>
                                     </div>
                                     <div className="w-px h-6 bg-forest-800 hidden md:block" />
                                     <p className="text-[10px] font-medium text-cream-200 uppercase tracking-widest">

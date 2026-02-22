@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
-import { Shield, ShieldAlert, Trash2, Loader2, User } from 'lucide-react'
+import { Shield, ShieldAlert, Trash2, Loader2, User, Filter, ArrowUpDown } from 'lucide-react'
 import { updateUserRole, deleteUser } from '@/app/actions/users'
 
 interface Profile {
@@ -22,6 +22,8 @@ interface AdminUserListProps {
 export default function AdminUserList({ users, currentUserId }: AdminUserListProps) {
     const router = useRouter()
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({})
+    const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user'>('all')
+    const [dateSort, setDateSort] = useState<'newest' | 'oldest'>('newest')
 
     const handleRoleUpdate = async (userId: string, currentRole: 'admin' | 'user') => {
         if (!confirm(`Are you sure you want to change this user's role?`)) return
@@ -54,79 +56,153 @@ export default function AdminUserList({ users, currentUserId }: AdminUserListPro
         }
     }
 
-    return (
-        <div className="bg-white rounded-2xl shadow-sm border border-cream-300 overflow-hidden">
-            <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="bg-cream-50 border-b border-cream-200">
-                            <th className="px-6 py-4 font-bold text-forest-800 text-sm uppercase tracking-wider">User</th>
-                            <th className="px-6 py-4 font-bold text-forest-800 text-sm uppercase tracking-wider">Role</th>
-                            <th className="px-6 py-4 font-bold text-forest-800 text-sm uppercase tracking-wider">Joined</th>
-                            <th className="px-6 py-4 font-bold text-forest-800 text-sm uppercase tracking-wider text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-cream-100">
-                        {users.map((user) => (
-                            <tr key={user.id} className="hover:bg-cream-50/50 transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-forest-100 flex items-center justify-center text-forest-600 font-bold">
-                                            {user.full_name ? user.full_name[0].toUpperCase() : <User size={20} />}
-                                        </div>
-                                        <div>
-                                            <div className="font-bold text-forest-900">{user.full_name || 'Unknown'}</div>
-                                            <div className="text-sm text-forest-500">{user.email}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${user.role === 'admin'
-                                            ? 'bg-purple-100 text-purple-700'
-                                            : 'bg-green-100 text-green-700'
-                                        }`}>
-                                        {user.role === 'admin' ? <Shield size={12} /> : <User size={12} />}
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-forest-600">
-                                    {new Date(user.created_at).toLocaleDateString()}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                        {loadingMap[user.id] ? (
-                                            <Loader2 className="animate-spin text-forest-400" size={20} />
-                                        ) : (
-                                            <>
-                                                <button
-                                                    onClick={() => handleRoleUpdate(user.id, user.role)}
-                                                    className={`p-2 rounded-lg transition-colors ${user.role === 'admin'
-                                                            ? 'text-orange-500 hover:bg-orange-50'
-                                                            : 'text-purple-600 hover:bg-purple-50'
-                                                        }`}
-                                                    title={user.role === 'admin' ? 'Remove Admin Access' : 'Make Admin'}
-                                                >
-                                                    {user.role === 'admin' ? <ShieldAlert size={18} /> : <Shield size={18} />}
-                                                </button>
+    const processedUsers = useMemo(() => {
+        return [...users]
+            .filter(user => roleFilter === 'all' || user.role === roleFilter)
+            .sort((a, b) => {
+                // Primary Sort: Admin First
+                if (a.role === 'admin' && b.role !== 'admin') return -1
+                if (a.role !== 'admin' && b.role === 'admin') return 1
 
-                                                {/* Only allow deleting other users, not self */}
-                                                {user.id !== currentUserId && (
-                                                    <button
-                                                        onClick={() => handleDelete(user.id)}
-                                                        className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
-                                                        title="Delete User"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
+                // Secondary Sort: Date
+                const dateA = new Date(a.created_at).getTime()
+                const dateB = new Date(b.created_at).getTime()
+                return dateSort === 'newest' ? dateB - dateA : dateA - dateB
+            })
+    }, [users, roleFilter, dateSort])
+
+    return (
+        <div className="space-y-4">
+            {/* Filter Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl border border-cream-300 shadow-sm">
+                <div className="flex items-center gap-2">
+                    <Filter size={18} className="text-forest-400" />
+                    <span className="text-sm font-bold text-forest-700 mr-2">Filter Role:</span>
+                    <div className="flex bg-cream-50 p-1 rounded-lg border border-cream-200">
+                        {['all', 'admin', 'user'].map((role) => (
+                            <button
+                                key={role}
+                                onClick={() => setRoleFilter(role as any)}
+                                className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all uppercase tracking-wider ${roleFilter === role
+                                    ? 'bg-white text-forest-950 shadow-sm'
+                                    : 'text-forest-400 hover:text-forest-600'
+                                    }`}
+                            >
+                                {role}
+                            </button>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <ArrowUpDown size={18} className="text-forest-400" />
+                    <span className="text-sm font-bold text-forest-700 mr-2">Joining Date:</span>
+                    <select
+                        value={dateSort}
+                        onChange={(e) => setDateSort(e.target.value as any)}
+                        className="bg-cream-50 border border-cream-200 text-forest-900 text-xs font-bold rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-forest-100 transition-all cursor-pointer"
+                    >
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+            </div>
+
+            {/* User List Table */}
+            <div className="bg-white rounded-2xl shadow-md border border-cream-300 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-forest-950 text-white border-b border-forest-800">
+                                <th className="px-6 py-5 font-black text-xs uppercase tracking-widest text-cream-100">User Details</th>
+                                <th className="px-6 py-5 font-black text-xs uppercase tracking-widest text-cream-100">System Role</th>
+                                <th className="px-6 py-5 font-black text-xs uppercase tracking-widest text-cream-100">Joining Date</th>
+                                <th className="px-6 py-5 font-black text-xs uppercase tracking-widest text-cream-100 text-right">Settings</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-cream-100">
+                            {processedUsers.map((user) => (
+                                <tr key={user.id} className={`group hover:bg-cream-50 transition-colors ${user.role === 'admin' ? 'bg-purple-50/30' : ''}`}>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-11 h-11 rounded-full shadow-sm flex items-center justify-center text-lg font-black ${user.role === 'admin'
+                                                ? 'bg-purple-600 text-white'
+                                                : 'bg-cream-100 text-forest-900 border border-cream-200'
+                                                }`}>
+                                                {user.full_name ? user.full_name[0].toUpperCase() : <User size={22} />}
+                                            </div>
+                                            <div>
+                                                <div className="font-black text-forest-950 flex items-center gap-2">
+                                                    {user.full_name || 'Anonymous User'}
+                                                    {user.id === currentUserId && (
+                                                        <span className="text-[9px] font-black uppercase tracking-tighter px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-200">You</span>
+                                                    )}
+                                                </div>
+                                                <div className="text-sm font-medium text-forest-400 group-hover:text-forest-600 transition-colors">{user.email}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border-2 ${user.role === 'admin'
+                                            ? 'bg-white border-purple-600 text-purple-700 shadow-sm'
+                                            : 'bg-white border-forest-200 text-forest-600'
+                                            }`}>
+                                            {user.role === 'admin' ? <Shield size={12} strokeWidth={3} /> : <User size={12} strokeWidth={3} />}
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-xs font-bold text-forest-800 tracking-wider">
+                                        {new Date(user.created_at).toLocaleDateString('en-GB', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric'
+                                        })}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            {loadingMap[user.id] ? (
+                                                <Loader2 className="animate-spin text-forest-400" size={20} />
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleRoleUpdate(user.id, user.role)}
+                                                        className={`p-2.5 rounded-xl border-2 transition-all hover:scale-110 active:scale-95 ${user.role === 'admin'
+                                                            ? 'text-orange-500 border-orange-100 hover:bg-orange-50'
+                                                            : 'text-purple-600 border-purple-100 hover:bg-purple-50'
+                                                            }`}
+                                                        title={user.role === 'admin' ? 'Remove Admin Access' : 'Make Admin'}
+                                                    >
+                                                        {user.role === 'admin' ? <ShieldAlert size={20} /> : <Shield size={20} />}
+                                                    </button>
+
+                                                    {user.id !== currentUserId && (
+                                                        <button
+                                                            onClick={() => handleDelete(user.id)}
+                                                            className="p-2.5 rounded-xl border-2 border-red-100 text-red-500 hover:bg-red-50 transition-all hover:scale-110 active:scale-95"
+                                                            title="Delete User"
+                                                        >
+                                                            <Trash2 size={20} />
+                                                        </button>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    {processedUsers.length === 0 && (
+                        <div className="py-20 text-center bg-cream-50/30">
+                            <div className="w-16 h-16 bg-cream-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-forest-200">
+                                <User className="text-forest-200" size={32} />
+                            </div>
+                            <h3 className="font-black text-forest-900 uppercase tracking-widest text-sm">No users found</h3>
+                            <p className="text-xs text-forest-400 font-bold mt-1 uppercase tracking-tighter">Try adjusting your filters</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )

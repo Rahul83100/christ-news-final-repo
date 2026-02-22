@@ -7,7 +7,7 @@ import { Article } from '@/lib/types'
 import ArticlePage from './ArticlePage'
 import PDFPageRenderer from './PDFPageRenderer'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, Maximize, Minimize, Download, ExternalLink, Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, X, Maximize, Minimize, Download, ExternalLink, Plus, Lock } from 'lucide-react'
 import clsx from 'clsx'
 import { forwardRef } from 'react'
 import * as pdfjs from 'pdfjs-dist'
@@ -118,6 +118,9 @@ export default function PageFlip({ articles, editionTitle, editionPdfUrl, editio
   const [expandedPages, setExpandedPages] = useState<BookPageType[]>([])
   const [isProcessing, setIsProcessing] = useState(true)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [aiPrompt, setAiPrompt] = useState('')
+  const [aiResponse, setAiResponse] = useState<string | null>(null)
+  const [isAiLoading, setIsAiLoading] = useState(false)
   const router = useRouter()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -241,7 +244,7 @@ export default function PageFlip({ articles, editionTitle, editionPdfUrl, editio
 
   const downloadPdf = () => {
     if (!user) {
-      toast.error("Please sign up to download the article!")
+      toast.error("Please sign in to download")
       router.push('/sign-up')
       return
     }
@@ -259,6 +262,12 @@ export default function PageFlip({ articles, editionTitle, editionPdfUrl, editio
   }
 
   const openPdf = () => {
+    if (!user) {
+      toast.error("Please sign in to preview")
+      router.push('/sign-up')
+      return
+    }
+
     if (activeArticle?.pdf_url) {
       window.open(activeArticle.pdf_url, '_blank')
     } else {
@@ -471,11 +480,13 @@ export default function PageFlip({ articles, editionTitle, editionPdfUrl, editio
               </button>
             )}
 
-            <button onClick={openPdf} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded text-xs font-medium text-forest-700" title="Open PDF">
-              <ExternalLink size={16} /> <span className="hidden sm:inline">Preview PDF</span>
+            <button onClick={openPdf} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded text-xs font-medium text-forest-700" title={user ? "Open PDF" : "Sign in to Preview"}>
+              {user ? <ExternalLink size={16} /> : <Lock size={14} className="text-maroon-600" />}
+              <span className="hidden sm:inline">Preview PDF</span>
             </button>
-            <button onClick={downloadPdf} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded text-xs font-medium text-forest-700" title="Download PDF">
-              <Download size={16} /> <span className="hidden sm:inline">Download</span>
+            <button onClick={downloadPdf} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded text-xs font-medium text-forest-700" title={user ? "Download PDF" : "Sign in to Download"}>
+              {user ? <Download size={16} /> : <Lock size={14} className="text-maroon-600" />}
+              <span className="hidden sm:inline">Download</span>
             </button>
           </div>
 

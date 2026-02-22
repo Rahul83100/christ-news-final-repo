@@ -121,7 +121,7 @@ export default function SignUpPage() {
 
             // 3. Check for admin promotion
             const { data: adminEmail } = await supabase
-                .from('admin_emails')
+                .from('admin_users')
                 .select('id')
                 .eq('email', email.toLowerCase().trim())
                 .single()

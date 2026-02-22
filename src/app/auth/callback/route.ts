@@ -47,7 +47,7 @@ export async function GET(request: Request) {
                 // Check if this email was pre-registered as admin
                 if (user.email) {
                     const { data: adminEmail } = await supabase
-                        .from('admin_emails')
+                        .from('admin_users')
                         .select('id')
                         .eq('email', user.email.toLowerCase().trim())
                         .single()

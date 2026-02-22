@@ -32,7 +32,7 @@ export default async function UsersPage() {
 
     // Fetch pre-registered admin emails
     const { data: adminEmails } = await supabase
-        .from('admin_emails')
+        .from('admin_users')
         .select('*')
         .order('created_at', { ascending: false })
 
