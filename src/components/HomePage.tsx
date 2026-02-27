@@ -115,7 +115,9 @@ export default function HomePage({ isAdmin }: HomePageProps) {
                             transition={{ delay: 0.2 }}
                             className="font-serif text-xl md:text-2xl text-forest-700 max-w-3xl mx-auto leading-relaxed opacity-90"
                         >
-                            A premium collection of scholarly articles, creative newsletters, and community updates from the heart of CHRIST Online.
+                            Welcome to E-Luminate, your space for insights, updates, and ideas that inspire learning and innovation.
+                            <br /><br />
+                            Stay connected with the latest highlights, achievements, and opportunities from our academic community.
                         </motion.p>
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
